@@ -1,0 +1,571 @@
+---
+title: "Cox Model - PTEN PanCancer (Overall survival)"
+output:
+  pdf_document: default
+  html_notebook: default
+  word_document: default
+---
+
+#Cox Model Cox Model results of overall survival (OS) from 30 different tumor types. PTEN SCNA + TP53 somatic mutation as design formula.
+
+```{r include=FALSE}
+library(ggplot2)
+library(ggsignif)
+library(ggpubr)
+library(survminer)
+library(survival)
+library(ranger)
+library(tidyverse)
+library(ggfortify)
+library(egg)
+```
+
+```{r include=FALSE}
+teste <- read_tsv("clinical_PanCancer_PTEN_2_pten_tp.txt",
+                  col_names = T)
+teste$PTEN_SCNA_status <- factor(teste$PTEN_SCNA_status, levels = c("Intact","HomDel","HemDel"))
+teste$Combined <- factor(teste$Combined, levels = c("Intact_WT","Intact_MonAll",
+                                                            "Intact_BiAll", "HomDel_WT",
+                                                            "HomDel_MonAll", "HomDel_BiAll",
+                                                            "HemDel_WT", "HemDel_MonAll",
+                                                            "HemDel_BiAll"))
+```
+
+```{r include=FALSE}
+acc <- teste %>% filter(TCGA_Study == c("ACC"))
+blca <- teste %>% filter(TCGA_Study == "BLCA")
+brca <- teste %>% filter(TCGA_Study == "BRCA")
+brain <- teste %>% filter(TCGA_Study ==  c("GBM", "LGG"))
+cesc <- teste %>% filter(TCGA_Study == "CESC")
+coad <- teste %>% filter(TCGA_Study == "COAD")
+dlbc <- teste %>% filter(TCGA_Study == "DLBC")
+esca <- teste %>% filter(TCGA_Study == "ESCA")
+hnsc <- teste %>% filter(TCGA_Study == "HNSC")
+kich <- teste %>% filter(TCGA_Study == "KICH")
+kirc <- teste %>% filter(TCGA_Study == "KIRC")
+kirp <- teste %>% filter(TCGA_Study == "KIRP")
+lihc <- teste %>% filter(TCGA_Study == "LIHC")
+luad <- teste %>% filter(TCGA_Study == "LUAD")
+lusc <- teste %>% filter(TCGA_Study == "LUSC")
+meso <- teste %>% filter(TCGA_Study == "MESO")
+ov <- teste %>% filter(TCGA_Study == "OV")
+paad <- teste %>% filter(TCGA_Study == "PAAD")
+pcpg <- teste %>% filter(TCGA_Study == "PCPG")
+prad <- teste %>% filter(TCGA_Study == "PRAD")
+read <- teste %>% filter(TCGA_Study == "READ")
+sarc <- teste %>% filter(TCGA_Study == "SARC")
+skcm <- teste %>% filter(TCGA_Study == "SKCM")
+stad <- teste %>% filter(TCGA_Study == "STAD")
+tgct <- teste %>% filter(TCGA_Study == "TGCT")
+thca <- teste %>% filter(TCGA_Study == "THCA")
+thym <- teste %>% filter(TCGA_Study == "THYM")
+ucec <- teste %>% filter(TCGA_Study == "UCEC")
+ucs <- teste %>% filter(TCGA_Study == "UCS")
+uvm <- teste %>% filter(TCGA_Study == "UVM")
+```
+
+```{r include=FALSE}
+acc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = acc)
+acc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=acc)
+
+blca_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = blca)
+blca_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=blca)
+
+brca_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = brca)
+brca_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=brca)
+
+brain_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = brain)
+brain_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=brain)
+
+cesc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = cesc)
+cesc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=cesc)
+
+coad_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = coad)
+coad_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=coad)
+
+dlbc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = dlbc)
+dlbc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=dlbc)
+
+esca_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = esca)
+esca_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=esca)
+
+hnsc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = hnsc)
+hnsc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=hnsc)
+
+kich_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = kich)
+kich_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=kich)
+
+kirc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = kirc)
+kirc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=kirc)
+
+kirp_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = kirp)
+kirp_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=kirp)
+
+lihc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = lihc)
+lihc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=lihc)
+
+luad_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = luad)
+luad_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=luad)
+
+lusc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = lusc)
+lusc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=lusc)
+
+meso_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = meso)
+meso_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=meso)
+
+ov_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = ov)
+ov_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=ov)
+
+paad_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = paad)
+paad_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=paad)
+
+pcpg_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = pcpg)
+pcpg_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=pcpg)
+
+prad_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = prad)
+prad_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=prad)
+
+read_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = read)
+read_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=read)
+
+sarc_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = sarc)
+sarc_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=sarc)
+
+#skcm_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+#             data = skcm)
+
+stad_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = stad)
+stad_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=stad)
+
+tgct_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = tgct)
+tgct_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=tgct)
+
+thca_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = thca)
+thca_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=thca)
+
+thym_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = thym)
+thym_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=thym)
+
+ucec_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = ucec)
+ucec_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=ucec)
+
+ucs_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = ucs)
+ucs_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=ucs)
+
+uvm_cox <- coxph(Surv(OS_Time, OS) ~ PTEN_SCNA_status, 
+             data = uvm)
+uvm_KM <- survfit(Surv(OS_Time, OS) ~ PTEN_SCNA_status, data=uvm)
+
+```
+
+**ACC**
+Adrenocortical Carcinoma
+```{r}
+acc_plot <- ggsurvplot(acc_KM, pval = "Log-Rank p-value Hemdel = 0.09", 
+                       risk.table = TRUE,
+                       title = "ACC", xlab="Time (Days)",
+                       legend.labs = c("Intact", "HemDel"), legend.title = "",
+                       pval.coord = c(0, 0.03), palette = c("forestgreen","dodgerblue2"),
+                       legend = c(0.9, 0.9), ylab = "",
+                       ggtheme = theme_article(), pval.size = 5)
+acc_plot
+summary(acc_cox)
+
+```
+
+**BLCA**
+Bladder Urothelial Carcinoma
+```{r}
+blca_plot <- ggsurvplot(blca_KM, pval = "Log-Rank p-value Homdel = 0.6; Hemdel = 0.04", risk.table = TRUE,
+                      title = "BLCA", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+blca_plot
+summary(blca_cox)
+```
+
+**BRCA**
+Breast Invasive Carcinoma
+```{r}
+brca_plot <- ggsurvplot(brca_KM, pval = "Log-Rank p-value Homdel = 0.5; Hemdel = 0.4", risk.table = TRUE,
+                      title = "BRCA", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+brca_plot
+summary(brca_cox)
+```
+
+**BRAIN**
+LGG, Brain Lower Grade Glioma, and GBM, Glioblastoma 
+```{r}
+brain_plot <- ggsurvplot(brain_KM, pval = "Log-Rank p-value Homdel<0.0001; Hemdel<0.0001", risk.table = TRUE,
+                      title = "Brain", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+brain_plot
+summary(brain_cox)
+```
+
+**CESC**
+Cervical Squamous Cell Carcinoma
+```{r}
+cesc_plot <- ggsurvplot(cesc_KM, pval = "Log-Rank p-value Homdel = 0.8; Hemdel = 0.09", risk.table = TRUE,
+                      title = "CESC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+cesc_plot
+summary(cesc_cox)
+```
+
+**COAD**
+Colon Adenocarcinoma
+```{r}
+coad_plot <- ggsurvplot(coad_KM, pval = "Log-Rank p-value Homdel = 0.2; Hemdel = 0.7", risk.table = TRUE,
+                      title = "COAD", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+coad_plot
+summary(coad_cox)
+```
+
+**DLBC**
+Lymphoid Neoplasm Diffuse Large B-cell Lymphoma
+```{r}
+dlbc_plot <- ggsurvplot(dlbc_KM, pval = "Log-Rank p-value Homdel = 0.3; Hemdel = 0.7", risk.table = TRUE,
+                      title = "DLBC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+dlbc_plot
+summary(dlbc_cox)
+```
+
+**ESCA**
+Esophageal Carcinoma
+```{r}
+esca_plot <- ggsurvplot(esca_KM, pval = "Log-Rank p-value Homdel = 0.5; Hemdel = 0.9", risk.table = TRUE,
+                      title = "ESCA", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+esca_plot
+summary(esca_cox)
+```
+
+**HNSC**
+Head and Neck Squamous Cell Carcinoma
+```{r}
+hnsc_plot <- ggsurvplot(hnsc_KM, pval = "Log-Rank p-value Homdel = 0.08; Hemdel = 0.39", risk.table = TRUE,
+                      title = "HNSC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+hnsc_plot
+summary(hnsc_cox)
+```
+
+**KICH**
+Kidney Chromophobe Renal Cell Carcinoma
+```{r}
+kich_plot <- ggsurvplot(kich_KM, pval = "Log-Rank p-value Homdel = 1; Hemdel = 0.9", risk.table = TRUE,
+                      title = "KICH", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+kich_plot
+summary(kich_cox)
+```
+
+**KIRC**
+Kidney Renal Clear Cell Carcinoma
+```{r}
+kirc_plot <- ggsurvplot(kirc_KM, pval = "Log-Rank p-value Homdel<0.001; Hemdel = 0.5", risk.table = TRUE,
+                      title = "KIRC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+kirc_plot
+summary(kirc_cox)
+```
+
+**KIRP**
+Kidney Renal papillary Cell Carcinoma
+```{r}
+kirp_plot <- ggsurvplot(kirp_KM, pval = "Log-Rank p-value Homdel = 1; Hemdel = 0.006", risk.table = TRUE,
+                      title = "KIRP", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+kirp_plot
+summary(kirp_cox)
+```
+
+**LIHC**
+Liver Hepatocellular Carcinoma
+```{r}
+lihc_plot <- ggsurvplot(lihc_KM, pval = "Log-Rank p-value Homdel = 1; Hemdel = 0.2", risk.table = TRUE,
+                      title = "LIHC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+lihc_plot
+summary(lihc_cox)
+```
+
+**LUAD**
+Lung Adenocarcinoma
+```{r}
+luad_plot <- ggsurvplot(luad_KM, pval = "Log-Rank p-value Homdel = 0.2; Hemdel = 0.4", risk.table = TRUE,
+                      title = "LUAD", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+luad_plot
+summary(luad_cox)
+```
+
+**LUSC**
+Lung Squamous Cell Carcinoma
+```{r}
+lusc_plot <- ggsurvplot(lusc_KM, pval = "Log-Rank p-value Homdel = 0.09; Hemdel = 0.3", risk.table = TRUE,
+                      title = "LUSC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+lusc_plot
+summary(lusc_cox)
+```
+
+**MESO**
+Mesothelioma
+```{r}
+meso_plot <- ggsurvplot(meso_KM, pval = "Log-Rank p-value Homdel = 0.6; Hemdel = 0.004", risk.table = TRUE,
+                      title = "MESO", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+meso_plot
+summary(meso_cox)
+```
+
+**OV**
+Ovarian Serous Cystadenocarcinoma
+```{r}
+ov_plot <- ggsurvplot(ov_KM, pval = "Log-Rank p-value Homdel = 0.1; Hemdel = 0.1", risk.table = TRUE,
+                      title = "OV", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+ov_plot
+summary(ov_cox)
+```
+
+**PAAD**
+Pancreatic Adenocarcinoma
+```{r}
+paad_plot <- ggsurvplot(paad_KM, pval = "Log-Rank p-value Homdel = 0.02; Hemdel = 0.9", risk.table = TRUE,
+                      title = "PAAD", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+paad_plot
+summary(paad_cox)
+```
+
+**PCPG**
+Pheochromocytoma and Paraganglioma
+```{r}
+pcpg_plot <- ggsurvplot(pcpg_KM, pval = "Log-Rank p-value Homdel = 1; Hemdel = 1", risk.table = TRUE,
+                      title = "PCPG", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+pcpg_plot
+summary(pcpg_cox)
+```
+
+**PRAD**
+Prostate Adenocarcinoma
+```{r}
+prad_plot <- ggsurvplot(prad_KM, pval = "Log-Rank p-value Homdel = 0.9; Hemdel = 0.8", risk.table = TRUE,
+                      title = "PRAD", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+prad_plot
+summary(prad_cox)
+```
+
+**READ**
+Rectum Adenocarcinoma
+```{r}
+read_plot <- ggsurvplot(read_KM, pval = "Log-Rank p-value Hemdel = 0.052", risk.table = TRUE,
+                      title = "READ", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+read_plot
+summary(read_cox)
+```
+
+**SARC**
+Sarcoma
+```{r}
+sarc_plot <- ggsurvplot(sarc_KM, pval = "Log-Rank p-value Homdel = 0.008; Hemdel = 0.3", risk.table = TRUE,
+                      title = "SARC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+sarc_plot
+summary(sarc_cox)
+```
+
+**STAD**
+Stomach Adenocarcinoma
+```{r}
+stad_plot <- ggsurvplot(stad_KM, pval = "Log-Rank p-value Homdel = 0.009; Hemdel = 0.1", risk.table = TRUE,
+                      title = "STAD", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+stad_plot
+summary(stad_cox)
+```
+
+
+**TGCT**
+Testicular Germ Cell Tumors
+```{r}
+tgct_plot <- ggsurvplot(tgct_KM, pval = "Log-Rank p-value Homdel = 0.9; Hemdel = 0.3", risk.table = TRUE,
+                      title = "TGCT", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+tgct_plot
+summary(tgct_cox)
+```
+
+
+**THCA**
+Thyroid Carcinoma
+```{r echo=FALSE}
+thca_plot <- ggsurvplot(thca_KM, pval = "Log-Rank p-value Homdel = 1; Hemdel = 1", risk.table = TRUE,
+                      title = "THCA", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+thca_plot
+summary(thca_cox)
+```
+
+**THYM**
+Thymoma
+```{r echo=FALSE}
+thym_plot <- ggsurvplot(thym_KM, pval = "Log-Rank p-value Hemdel = 1", risk.table = TRUE,
+                      title = "THYM", xlab="Time (Days)",
+                      legend.labs = c("Intact", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 6)
+thym_plot
+summary(thym_cox)
+```
+
+
+**UCEC**
+Uterine Endometrioid Carcinoma
+```{r echo=FALSE}
+ucec_plot <- ggsurvplot(ucec_KM, pval = "Log-Rank p-value Homdel = 0.001; Hemdel<0.0001", risk.table = TRUE,
+                      title = "UCEC", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+ucec_plot
+summary(ucec_cox)
+```
+
+
+**UCS**
+Uterine Carcinosarcoma
+```{r echo=FALSE}
+ucs_plot <- ggsurvplot(ucs_KM, pval = "Log-Rank p-value Homdel = 0.02; Hemdel = 0.8", risk.table = TRUE,
+                      title = "UCS", xlab="Time (Days)",
+                      legend.labs = c("Intact","HomDel", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","red2","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+ucs_plot
+summary(ucs_cox)
+```
+
+
+**UVM**
+Uveal Melanoma
+```{r echo=FALSE}
+uvm_plot <- ggsurvplot(uvm_KM, pval = "Log-Rank p-value Hemdel = 0.09", risk.table = TRUE,
+                      title = "UVM", xlab="Time (Days)",
+                      legend.labs = c("Intact", "HemDel"), legend.title = "",
+                      pval.coord = c(0, 0.03), palette = c("forestgreen","dodgerblue2"),
+                      legend = c(0.9, 0.9), ylab = "",
+                      ggtheme = theme_article(), pval.size = 5)
+uvm_plot
+summary(uvm_cox)
+```
